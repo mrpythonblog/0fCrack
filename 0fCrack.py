@@ -16,13 +16,15 @@
 ##########################################
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMainWindow
 from pikepdf import open as openpdf
 import sys
 from os import path
 from pikepdf._qpdf import PasswordError
 from rarfile import RarFile,BadRarFile
-
-file_signs = {"255044462d" : "PDF" , "526172211a07" : "RAR"} # All Signs with Small Letters .
+from py7zr import SevenZipFile
+from _lzma import LZMAError # Seven Zip Files BAD Password ERROR .
+file_signs = {"255044462d" : "PDF" , "526172211a07" : "RAR" , "377abcaf271c" : "7Z"} # All Signs with Small Letters .
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -150,19 +152,37 @@ class Ui_MainWindow(object):
                     del msg
                     return
             elif file_type == "RAR":
-                password = self.rarCrackerAction()
+                # Rar Cracking
+                password = self.rarCrackAction()
                 if password:
                     msg = QtWidgets.QMessageBox.information(MainWindow , "Password Cracked" , "Password : {}".format(password) , QtWidgets.QMessageBox.Ok)
                     del msg
+                    self.progressBar.setProperty('value' , 0)
                     return
                 else:
                     msg = QtWidgets.QMessageBox.information(MainWindow , "Password Not Found !" , "Password Not Found in your Password List" , QtWidgets.QMessageBox.Ok)
                     del msg
+                    self.progressBar.setProperty('value' , 0)
                     return
+            elif file_type == "7Z":
+                ## 7z Cracking 
+                password = self.sevenZipCrackAction()
+                if password:
+                    msg = QtWidgets.QMessageBox.information(MainWindow , "Password Cracked" , "Password : {}".format(password) , QtWidgets.QMessageBox.Ok)
+                    del msg
+                    self.progressBar.setProperty('value' , 0)
+                    return
+                else:
+                    msg = QtWidgets.QMessageBox.information(MainWindow , "Password Not Found !" , "Password Not Found in your Password List" , QtWidgets.QMessageBox.Ok)
+                    del msg
+                    self.progressBar.setProperty('value' , 0)
+                    return
+
             else:
                 msg = QtWidgets.QMessageBox.information(MainWindow , "ERROR" , "I Can't Crack This File Type" , QtWidgets.QMessageBox.Ok)
                 del msg
                 return 
+            
         msg = QtWidgets.QMessageBox.information(MainWindow , "ERROR" , "Bad File Or PasswordList !" , QtWidgets.QMessageBox.Ok)
         del msg
 
@@ -170,7 +190,7 @@ class Ui_MainWindow(object):
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle("0fCrack GUI")
         self.open1.setText(_translate("MainWindow", "OPEN"))
         self.entry1.setPlaceholderText(_translate("MainWindow", "Open PDF File ...."))
         self.open2.setText(_translate("MainWindow", "OPEN"))
@@ -181,6 +201,7 @@ class Ui_MainWindow(object):
         progressBarValue = 0
         tested = 0
         for password in open(self.passwordlist):
+            app.processEvents() # Process Events when 0fCrack is Cracking ...
             password = password.strip("\n")
             try:
                 openpdf(self.file , password)
@@ -190,11 +211,12 @@ class Ui_MainWindow(object):
                 self.progressBar.setProperty("value" , (tested * 100) / self.n)
         return False
     
-    def rarCrackerAction(self):
+    def rarCrackAction(self):
         progressBarValue = 0
         tested = 0
         rar = RarFile(self.file)
         for password in open(self.passwordlist):
+            app.processEvents() # Process Events when 0fCrack is Cracking ...
             password = password.strip("\n")
             try:
                 rar.testrar(password)
@@ -203,18 +225,33 @@ class Ui_MainWindow(object):
                 tested += 1
                 self.progressBar.setProperty("value" , (tested * 100) / self.n)
         return False
-
+    def sevenZipCrackAction(self):
+        progressBarValue = 0
+        tested = 0
+        for password in open(self.passwordlist):
+            app.processEvents() # Process Events when 0fCrack is Cracking ...
+            password = password.strip("\n")
+            file = SevenZipFile(self.file , mode = "r" , password = password)
+            try:
+                file.testzip()
+                return password
+            except LZMAError:
+                tested += 1
+                self.progressBar.setProperty("value" , (tested * 100) / self.n)
+            except EOFError:
+                tested += 1
+                self.progressBar.setProperty("value" , (tested * 100) / self.n)
+        return False
+        
             
             
             
-
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    MainWindow.setWindowTitle("0fCrack GUI")
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
