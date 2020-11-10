@@ -6,10 +6,9 @@
   `pip3 install -r requirements.txt`
 
 2. Run Script :
-  * Get Help and Options : `python3 pdfcracker.py`
-  * Run in GUI Mode : `python3 pdfcracker.py -G`
+  * Run in GUI Mode : `python3 0fCrack.py`
 
 ## TODO :
-- [x] Support Rar , Zip , .... other offline crackings
+- [x] Support Rar , Zip , .... other offline cracking
 - [x] Improve GUI 
 
