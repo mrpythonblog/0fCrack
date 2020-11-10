@@ -124,6 +124,10 @@ class Ui_MainWindow(object):
                 passwordlist.close()
                 self.label.setText("{} Passwords Loaded . Ready To Attack !".format(self.n))
     def attackButtonAction(self):
+        if ("passwordlist" not in dir(self)) or ("file" not in dir(self)):
+            msg = QtWidgets.QMessageBox.information(MainWindow , "ERROR" , "please select both File and Password List !" , QtWidgets.QMessageBox.Ok)
+            del msg
+            return
         if self.passwordlist and self.file and path.isfile(self.passwordlist) and path.isfile(self.file):
             # everything is ok ...
             # Detect The File Type Using File Signuture
