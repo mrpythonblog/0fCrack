@@ -20,8 +20,9 @@ from pikepdf import open as openpdf
 import sys
 from os import path
 from pikepdf._qpdf import PasswordError
+from rarfile import RarFile,BadRarFile
 
-file_signs = {"255044462d" : "PDF"}
+file_signs = {"255044462d" : "PDF" , "526172211a07" : "RAR"} # All Signs with Small Letters .
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -143,6 +144,16 @@ class Ui_MainWindow(object):
                     msg = QtWidgets.QMessageBox.information(MainWindow , "Password Not Found !" , "Password Not Found in your Password List" , QtWidgets.QMessageBox.Ok)
                     del msg
                     return
+            elif file_type == "RAR":
+                password = self.rarCrackerAction()
+                if password:
+                    msg = QtWidgets.QMessageBox.information(MainWindow , "Password Cracked" , "Password : {}".format(password) , QtWidgets.QMessageBox.Ok)
+                    del msg
+                    return
+                else:
+                    msg = QtWidgets.QMessageBox.information(MainWindow , "Password Not Found !" , "Password Not Found in your Password List" , QtWidgets.QMessageBox.Ok)
+                    del msg
+                    return
             else:
                 msg = QtWidgets.QMessageBox.information(MainWindow , "ERROR" , "I Can't Crack This File Type" , QtWidgets.QMessageBox.Ok)
                 del msg
@@ -173,6 +184,21 @@ class Ui_MainWindow(object):
                 tested += 1
                 self.progressBar.setProperty("value" , (tested * 100) / self.n)
         return False
+    
+    def rarCrackerAction(self):
+        progressBarValue = 0
+        tested = 0
+        rar = RarFile(self.file)
+        for password in open(self.passwordlist):
+            password = password.strip("\n")
+            try:
+                rar.testrar(password)
+                return password
+            except BadRarFile:
+                tested += 1
+                self.progressBar.setProperty("value" , (tested * 100) / self.n)
+        return False
+
             
             
             
