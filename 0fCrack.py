@@ -117,6 +117,7 @@ class Ui_MainWindow(object):
                 self.entry2.setText(passwordlist)
                 passwordlist = open(passwordlist,"r")
                 self.n = 0
+                self.passwordListWidget.clear() # Clear Items of Password List Widget
                 for password in passwordlist:
                     password = password.strip("\n")
                     self.passwordListWidget.addItem(password)
