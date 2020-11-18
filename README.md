@@ -6,6 +6,7 @@
   * PDF Cracking
   * RAR Cracking
   * 7z Cracking
+  * ZIP Cracking
 
 
 ## Installing :

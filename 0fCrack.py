@@ -24,7 +24,9 @@ from pikepdf._qpdf import PasswordError
 from rarfile import RarFile,BadRarFile
 from py7zr import SevenZipFile
 from _lzma import LZMAError # Seven Zip Files BAD Password ERROR .
-file_signs = {"255044462d" : "PDF" , "526172211a07" : "RAR" , "377abcaf271c" : "7Z"} # All Signs with Small Letters .
+from zipfile import ZipFile
+
+file_signs = {"255044462d" : "PDF" , "526172211a07" : "RAR" , "377abcaf271c" : "7Z", "504b" : "ZIP"} # All Signs with Small Letters .
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -177,6 +179,19 @@ class Ui_MainWindow(object):
                     del msg
                     self.progressBar.setProperty('value' , 0)
                     return
+            elif file_type == "ZIP":
+                ##‌ ZIP Cracking
+                password = self.ZipCrackAction()
+                if password:
+                    msg = QtWidgets.QMessageBox.information(MainWindow , "Password Cracked" , "Password : {}".format(password) , QtWidgets.QMessageBox.Ok)
+                    del msg
+                    self.progressBar.setProperty('value' , 0)
+                    return
+                else:
+                    msg = QtWidgets.QMessageBox.information(MainWindow , "Password Not Found !" , "Password Not Found in your Password List" , QtWidgets.QMessageBox.Ok)
+                    del msg
+                    self.progressBar.setProperty('value' , 0)
+                    return
 
             else:
                 msg = QtWidgets.QMessageBox.information(MainWindow , "ERROR" , "I Can't Crack This File Type" , QtWidgets.QMessageBox.Ok)
@@ -242,6 +257,23 @@ class Ui_MainWindow(object):
                 tested += 1
                 self.progressBar.setProperty("value" , (tested * 100) / self.n)
         return False
+    def ZipCrackAction(self):
+        progressBarValue = 0
+        tested = 0
+        for password in open(self.passwordlist):
+            app.processEvents()
+            password = password.strip("\n")
+            try:
+                file = ZipFile(self.file)
+                file.extractall(pwd = password.encode())
+                return password
+
+            except:
+                tested += 1
+                self.progressBar.setProperty("value" , (tested * 100) / self.n)
+
+
+
         
             
             
