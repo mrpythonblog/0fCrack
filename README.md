@@ -1,6 +1,6 @@
 # Offline Cracking Tool That supports both GUI And Console Form (VER 1.0)
 
-0fCrack is a Offline Cracking tools that will support Rar , Zip , 7z , PDF , .... Cracking .
+0fCrack is an Offline Cracking tools that will support Rar , Zip , 7z , PDF , .... Cracking .
 
 * Cracking Methods that 0fCrack Supports at last Version : 
   * PDF Cracking
